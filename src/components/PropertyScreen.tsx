@@ -81,7 +81,7 @@ export function PropertyScreen({
     return (
       <div className="flex flex-col pb-[120px]">
         <div style={{ height: 178 }} aria-hidden />
-        <RecordsSection specs={{ bedrooms, bathrooms, homeSize, lotSize }} onOpenSpecs={() => onTabChange('Specs')} />
+        <RecordsSection currentSpecs={{ bedrooms, bathrooms, homeSize, lotSize }} onOpenSpecs={() => onTabChange('Specs')} />
       </div>
     )
   }

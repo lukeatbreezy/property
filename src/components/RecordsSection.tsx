@@ -11,6 +11,16 @@ const UPDATE_SPECS_COLOR = '#ae6a5b'
 
 type Specs = { bedrooms: string; bathrooms: string; homeSize: string; lotSize: string }
 
+// Specs as they stood at time of listing/assessment. 2023 predates the 2026
+// remodel (see Specs > Condition: Remodel), so its home size is smaller than
+// the current specs — that mismatch is what surfaces the "Update specs" CTA.
+const CURRENT_ERA_SPECS: Specs = { bedrooms: '3', bathrooms: '2', homeSize: '2,000', lotSize: '24,500' }
+const PRE_REMODEL_SPECS: Specs = { bedrooms: '3', bathrooms: '2', homeSize: '1,800', lotSize: '24,500' }
+
+function specsMatch(a: Specs, b: Specs) {
+  return a.bedrooms === b.bedrooms && a.bathrooms === b.bathrooms && a.homeSize === b.homeSize && a.lotSize === b.lotSize
+}
+
 const SEGMENTS = ['Listings', 'Tax Records', 'Mortgage'] as const
 type Segment = (typeof SEGMENTS)[number]
 
@@ -66,36 +76,47 @@ function CardDivider() {
   )
 }
 
-function CardSpecsRow({ bedrooms, bathrooms, homeSize, lotSize, onOpenSpecs }: Specs & { onOpenSpecs: () => void }) {
-  const lotAcres = lotSize ? sqFtToAcres(lotSize) : '0'
+function CardSpecsRow({
+  specs,
+  currentSpecs,
+  onOpenSpecs,
+}: {
+  specs: Specs
+  currentSpecs: Specs
+  onOpenSpecs: () => void
+}) {
+  const lotAcres = specs.lotSize ? sqFtToAcres(specs.lotSize) : '0'
+  const isOutdated = !specsMatch(specs, currentSpecs)
   return (
     <div className="flex w-full items-center justify-between py-1">
       <div className="flex items-center gap-3" style={{ color: 'var(--content-secondary)' }}>
         <span className="flex items-center gap-1 text-[14px] leading-[1.26]">
           <img src={iconBed} alt="" className="size-4" />
-          {bedrooms}
+          {specs.bedrooms}
         </span>
         <span className="flex items-center gap-1 text-[14px] leading-[1.26]">
           <img src={iconBathtub} alt="" className="size-4" />
-          {bathrooms}
+          {specs.bathrooms}
         </span>
         <span className="flex items-center gap-1 text-[14px] leading-[1.26]">
           <img src={iconFloorplan} alt="" className="size-4" />
-          {homeSize} ft²
+          {specs.homeSize} ft²
         </span>
         <span className="flex items-center gap-1 text-[14px] leading-[1.26]">
           <img src={iconLot} alt="" className="size-4" />
           {lotAcres} ac
         </span>
       </div>
-      <button
-        type="button"
-        onClick={onOpenSpecs}
-        className="shrink-0 text-[15px] font-bold leading-[1.26] tracking-[-0.5px]"
-        style={{ color: UPDATE_SPECS_COLOR }}
-      >
-        Update specs
-      </button>
+      {isOutdated && (
+        <button
+          type="button"
+          onClick={onOpenSpecs}
+          className="shrink-0 text-[15px] font-bold leading-[1.26] tracking-[-0.5px]"
+          style={{ color: UPDATE_SPECS_COLOR }}
+        >
+          Update specs
+        </button>
+      )}
     </div>
   )
 }
@@ -166,6 +187,7 @@ function ListingEventCard({
   perSqFt,
   source,
   specs,
+  currentSpecs,
   onOpenSpecs,
 }: {
   date: string
@@ -175,6 +197,7 @@ function ListingEventCard({
   perSqFt: string
   source: string
   specs: Specs
+  currentSpecs: Specs
   onOpenSpecs: () => void
 }) {
   return (
@@ -202,7 +225,7 @@ function ListingEventCard({
       <CardDivider />
       <Row label={source} labelDim={false} />
       <CardDivider />
-      <CardSpecsRow {...specs} onOpenSpecs={onOpenSpecs} />
+      <CardSpecsRow specs={specs} currentSpecs={currentSpecs} onOpenSpecs={onOpenSpecs} />
     </Card>
   )
 }
@@ -215,6 +238,7 @@ function TaxYearCard({
   assessedValue,
   assessedValueTrend,
   specs,
+  currentSpecs,
   onOpenSpecs,
 }: {
   propertyTax: string
@@ -224,6 +248,7 @@ function TaxYearCard({
   assessedValue: string
   assessedValueTrend?: string
   specs: Specs
+  currentSpecs: Specs
   onOpenSpecs: () => void
 }) {
   return (
@@ -232,7 +257,7 @@ function TaxYearCard({
       <Row label="Land  + Additions:" value={`${land} + ${additions}`} />
       <Row label="Tax assessment:" value={assessedValue} trend={assessedValueTrend && <PriceTrend dir="up" percent={assessedValueTrend} />} />
       <CardDivider />
-      <CardSpecsRow {...specs} onOpenSpecs={onOpenSpecs} />
+      <CardSpecsRow specs={specs} currentSpecs={currentSpecs} onOpenSpecs={onOpenSpecs} />
     </Card>
   )
 }
@@ -328,14 +353,14 @@ function ListingDescriptionCard() {
 // relisted at $820k, then sold at $850k) and 2026 remodel (see Specs >
 // Condition: Remodel) match the Mortgage tab below.
 export const LISTING_EVENTS = [
-  { year: '2026', date: 'May 28', trend: '+4.2%', eventLabel: 'Listed for sale', price: '$1,000,000', perSqFt: '$500', source: 'OZMLS' },
-  { year: '2026', date: 'Feb 3', trend: '+12.9%', eventLabel: 'Price change', price: '$960,000', perSqFt: '$480', source: 'OZMLS' },
-  { year: '2023', date: 'Apr 2', trend: '+0.2%', eventLabel: 'Sold', price: '$850,000', perSqFt: '$425', source: 'Public Record' },
-  { year: '2023', date: 'Jan 15', trend: '', eventLabel: 'Listed for sale', price: '$820,000', perSqFt: '$410', source: 'OZMLS' },
-  { year: '2023', date: 'Jan 1', trend: '', eventLabel: 'Sold', price: '$820,000', perSqFt: '$410', source: 'Public Record' },
+  { year: '2026', date: 'May 28', trend: '+4.2%', eventLabel: 'Listed for sale', price: '$1,000,000', perSqFt: '$500', source: 'OZMLS', specs: CURRENT_ERA_SPECS },
+  { year: '2026', date: 'Feb 3', trend: '+12.9%', eventLabel: 'Price change', price: '$960,000', perSqFt: '$480', source: 'OZMLS', specs: CURRENT_ERA_SPECS },
+  { year: '2023', date: 'Apr 2', trend: '+0.2%', eventLabel: 'Sold', price: '$850,000', perSqFt: '$425', source: 'Public Record', specs: PRE_REMODEL_SPECS },
+  { year: '2023', date: 'Jan 15', trend: '', eventLabel: 'Listed for sale', price: '$820,000', perSqFt: '$410', source: 'OZMLS', specs: PRE_REMODEL_SPECS },
+  { year: '2023', date: 'Jan 1', trend: '', eventLabel: 'Sold', price: '$820,000', perSqFt: '$410', source: 'Public Record', specs: PRE_REMODEL_SPECS },
 ] as const
 
-function ListingsTab({ specs, onOpenSpecs }: { specs: Specs; onOpenSpecs: () => void }) {
+function ListingsTab({ currentSpecs, onOpenSpecs }: { currentSpecs: Specs; onOpenSpecs: () => void }) {
   const years = [...new Set(LISTING_EVENTS.map((e) => e.year))]
   return (
     <div className="flex w-full flex-col items-start gap-6 pt-6">
@@ -351,7 +376,8 @@ function ListingsTab({ specs, onOpenSpecs }: { specs: Specs; onOpenSpecs: () => 
               price={e.price}
               perSqFt={e.perSqFt}
               source={e.source}
-              specs={specs}
+              specs={e.specs}
+              currentSpecs={currentSpecs}
               onOpenSpecs={onOpenSpecs}
             />
           ))}
@@ -375,6 +401,7 @@ export const TAX_YEARS = [
     additions: '$326,000',
     assessedValue: '$890,000',
     assessedValueTrend: '+3.5%',
+    specs: CURRENT_ERA_SPECS,
   },
   {
     year: '2024',
@@ -384,6 +411,7 @@ export const TAX_YEARS = [
     additions: '$304,000',
     assessedValue: '$860,000',
     assessedValueTrend: '+2.4%',
+    specs: CURRENT_ERA_SPECS,
   },
   {
     year: '2023',
@@ -393,10 +421,11 @@ export const TAX_YEARS = [
     additions: '$292,000',
     assessedValue: '$840,000',
     assessedValueTrend: '',
+    specs: PRE_REMODEL_SPECS,
   },
 ] as const
 
-function TaxRecordsTab({ specs, onOpenSpecs }: { specs: Specs; onOpenSpecs: () => void }) {
+function TaxRecordsTab({ currentSpecs, onOpenSpecs }: { currentSpecs: Specs; onOpenSpecs: () => void }) {
   return (
     <div className="flex w-full flex-col items-start gap-5 pt-6">
       {TAX_YEARS.map(({ year, propertyTaxTrend, assessedValueTrend, ...card }) => (
@@ -405,7 +434,7 @@ function TaxRecordsTab({ specs, onOpenSpecs }: { specs: Specs; onOpenSpecs: () =
             {...card}
             propertyTaxTrend={propertyTaxTrend || undefined}
             assessedValueTrend={assessedValueTrend || undefined}
-            specs={specs}
+            currentSpecs={currentSpecs}
             onOpenSpecs={onOpenSpecs}
           />
         </YearGroup>
@@ -455,14 +484,14 @@ function MortgageTab() {
   )
 }
 
-export function RecordsSection({ specs, onOpenSpecs }: { specs: Specs; onOpenSpecs: () => void }) {
+export function RecordsSection({ currentSpecs, onOpenSpecs }: { currentSpecs: Specs; onOpenSpecs: () => void }) {
   const [segment, setSegment] = useState<Segment>('Listings')
 
   return (
     <div className="flex w-full flex-col items-start px-4 pb-2">
       <SegmentedControl active={segment} onChange={setSegment} />
-      {segment === 'Listings' && <ListingsTab specs={specs} onOpenSpecs={onOpenSpecs} />}
-      {segment === 'Tax Records' && <TaxRecordsTab specs={specs} onOpenSpecs={onOpenSpecs} />}
+      {segment === 'Listings' && <ListingsTab currentSpecs={currentSpecs} onOpenSpecs={onOpenSpecs} />}
+      {segment === 'Tax Records' && <TaxRecordsTab currentSpecs={currentSpecs} onOpenSpecs={onOpenSpecs} />}
       {segment === 'Mortgage' && <MortgageTab />}
     </div>
   )
