@@ -6,6 +6,9 @@ import { ProgressiveBlur } from './ProgressiveBlur'
 
 const DARK_HEIGHT = 106
 const LIGHT_HEIGHT = 158
+// StatusBar (62) + PropertyNav (36) with no title-bar row — the height of the
+// light stack on tabs (Summary) that don't show the back/save-changes row.
+const STATUS_NAV_HEIGHT = 98
 
 function TrailingButton({
   activeTab,
@@ -95,11 +98,19 @@ export function Header({
       </div>
 
       {/* Past the hero photo: light bar with the section tabs pinned in place. The
-          fill is fully opaque (not a translucent blur) so scrolled content
-          underneath never shows through it. */}
+          fill is fully opaque and snaps in/out on the `scrolled` threshold rather
+          than tracking scrollProgress continuously — fading its opacity in step
+          with scroll position left it genuinely semi-transparent for as long as
+          the user paused mid-scroll, letting the page content underneath show
+          through. */}
       <div
         className="absolute inset-x-0 top-0 overflow-hidden rounded-b-[24px] transition-opacity duration-100 ease-out"
-        style={{ height: LIGHT_HEIGHT, opacity: scrollProgress, pointerEvents: scrolled ? 'auto' : 'none', zIndex: 2 }}
+        style={{
+          height: showTitleBarRow ? LIGHT_HEIGHT : STATUS_NAV_HEIGHT,
+          opacity: scrolled ? 1 : 0,
+          pointerEvents: scrolled ? 'auto' : 'none',
+          zIndex: 2,
+        }}
       >
         {contentScrolled && (
           <div
@@ -112,7 +123,7 @@ export function Header({
         <div className="relative flex flex-col">
           <StatusBar dark />
           {showTitleBarRow && (
-            <div className="flex items-center justify-between px-3 pb-2 pt-3">
+            <div className="flex items-center justify-between px-2 pb-2 pt-3">
               <GlassButton className="pointer-events-auto size-10 shrink-0">
                 <ArrowLeft size={17} color="var(--content-primary)" />
               </GlassButton>
