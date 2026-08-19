@@ -49,10 +49,11 @@ function Divider() {
   )
 }
 
-function ReviewButton() {
+function ReviewButton({ onClick }: { onClick?: () => void }) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className="flex h-9 shrink-0 items-center justify-center gap-1 rounded-full border px-3"
       style={{ borderColor: AI_BORDER }}
     >
@@ -71,6 +72,7 @@ function SpecRow({
   value,
   valueSub,
   review,
+  onReview,
   italic,
   border = true,
   short,
@@ -81,6 +83,7 @@ function SpecRow({
   value: string
   valueSub?: string
   review?: boolean
+  onReview?: () => void
   italic?: boolean
   border?: boolean
   short?: boolean
@@ -116,7 +119,7 @@ function SpecRow({
           </p>
         )}
       </div>
-      {review && <ReviewButton />}
+      {review && <ReviewButton onClick={onReview} />}
     </div>
   )
 }
@@ -509,6 +512,7 @@ export function SpecsSection({
   onChangeHomeSize,
   lotSize,
   onChangeLotSize,
+  onReviewSpec,
 }: {
   bedrooms: string
   onChangeBedrooms: (value: string) => void
@@ -518,6 +522,7 @@ export function SpecsSection({
   onChangeHomeSize: (value: string) => void
   lotSize: string
   onChangeLotSize: (value: string) => void
+  onReviewSpec: (review: { label: string; value: string; photo: string }) => void
 }) {
   return (
     <div className="flex w-full flex-col items-start px-4">
@@ -556,8 +561,22 @@ export function SpecsSection({
         <SpecRow icon={iconCalendarX} label="Year built" value="2010" />
         <SpecRow photo={specPropertyType} label="Property type" value="Single family" />
         <SpecRow photo={specStyle} label="Style" value="Contemporary" />
-        <SpecRow photo={specCondition} label="Condition" value="Remodel" italic review />
-        <SpecRow photo={specView} label="View" value="Woodlands" italic review />
+        <SpecRow
+          photo={specCondition}
+          label="Condition"
+          value="Remodel"
+          italic
+          review
+          onReview={() => onReviewSpec({ label: 'condition', value: 'Remodel', photo: specCondition })}
+        />
+        <SpecRow
+          photo={specView}
+          label="View"
+          value="Woodlands"
+          italic
+          review
+          onReview={() => onReviewSpec({ label: 'view', value: 'Woodlands', photo: specView })}
+        />
         <SpecRow icon={iconGarage} label="Garage spaces" value="4" border={false} />
       </div>
       <Divider />
