@@ -35,6 +35,7 @@ export function PropertyScreen({
   onChangeHomeSize,
   lotSize,
   onChangeLotSize,
+  onReviewSpec,
 }: {
   notes: Note[]
   onOpenAddNote: () => void
@@ -58,6 +59,7 @@ export function PropertyScreen({
   onChangeHomeSize: (value: string) => void
   lotSize: string
   onChangeLotSize: (value: string) => void
+  onReviewSpec: (review: { label: string; value: string; photo: string }) => void
 }) {
   if (activeTab === 'Specs') {
     return (
@@ -72,6 +74,7 @@ export function PropertyScreen({
           onChangeHomeSize={onChangeHomeSize}
           lotSize={lotSize}
           onChangeLotSize={onChangeLotSize}
+          onReviewSpec={onReviewSpec}
         />
       </div>
     )

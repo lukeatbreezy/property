@@ -12,6 +12,7 @@ import { MapSheet } from './components/MapSheet'
 import { AddContactSheet } from './components/AddContactSheet'
 import { PropertyMenu } from './components/PropertyMenu'
 import { PhotoViewer } from './components/PhotoViewer'
+import { SpecReviewSheet, type SpecReview } from './components/SpecReviewSheet'
 import { NAV_TABS } from './components/PropertyNav'
 import { formatEntryTimestamp } from './lib/formatEntryTimestamp'
 import type { Note, Owner, PriceDropAlertEntry, StatusAlertEntry } from './types'
@@ -30,6 +31,7 @@ function App() {
   const [addContactOwner, setAddContactOwner] = useState<Owner | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isPhotoViewerOpen, setIsPhotoViewerOpen] = useState(false)
+  const [specReview, setSpecReview] = useState<SpecReview | null>(null)
   const [bedrooms, setBedrooms] = useState('3')
   const [bathrooms, setBathrooms] = useState('2')
   const [homeSize, setHomeSize] = useState('2,000')
@@ -127,6 +129,12 @@ function App() {
             <AddContactSheet owner={addContactOwner} onClose={() => setAddContactOwner(null)} />
             <PropertyMenu open={isMenuOpen} onClose={() => setIsMenuOpen(false)} onShareProperty={() => setIsSharing(true)} />
             <PhotoViewer open={isPhotoViewerOpen} onClose={() => setIsPhotoViewerOpen(false)} />
+            <SpecReviewSheet
+              review={specReview}
+              onClose={() => setSpecReview(null)}
+              onConfirm={() => setSpecReview(null)}
+              onChange={() => setSpecReview(null)}
+            />
           </>
         }
       >
@@ -153,6 +161,7 @@ function App() {
           onChangeHomeSize={setHomeSize}
           lotSize={lotSize}
           onChangeLotSize={setLotSize}
+          onReviewSpec={setSpecReview}
         />
       </DeviceFrame>
     </div>
