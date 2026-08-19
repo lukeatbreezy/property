@@ -32,30 +32,26 @@ export function ActiveSection({
       <p className="text-[20px] font-bold leading-[1.26] text-[var(--content-primary)]">Active</p>
       <div className="flex w-full flex-col gap-4">
         {priceDropAlert && (
-          <NotepadRow
-            avatarImage={priceDrop}
-            topLine={{ text: priceDropAlert.date, size: 'small' }}
-            bottomLine={{ text: describeAlert(priceDropAlert), size: 'large' }}
-            background={ROW_BG}
-            action={
-              <button type="button" onClick={onEditPriceDropAlert} aria-label="Edit price drop alert">
-                <PencilSimple size={20} />
-              </button>
-            }
-          />
+          <button type="button" onClick={onEditPriceDropAlert} aria-label="Edit price drop alert" className="w-full text-left">
+            <NotepadRow
+              avatarImage={priceDrop}
+              topLine={{ text: priceDropAlert.date, size: 'small' }}
+              bottomLine={{ text: describeAlert(priceDropAlert), size: 'large' }}
+              background={ROW_BG}
+              action={<PencilSimple size={20} />}
+            />
+          </button>
         )}
         {statusAlert && (
-          <NotepadRow
-            avatarImage={statusChange}
-            topLine={{ text: statusAlert.date, size: 'small' }}
-            bottomLine={{ text: describeStatusAlert(statusAlert), size: 'large' }}
-            background={ROW_BG}
-            action={
-              <button type="button" onClick={onEditStatusAlert} aria-label="Edit status change alert">
-                <PencilSimple size={20} />
-              </button>
-            }
-          />
+          <button type="button" onClick={onEditStatusAlert} aria-label="Edit status change alert" className="w-full text-left">
+            <NotepadRow
+              avatarImage={statusChange}
+              topLine={{ text: statusAlert.date, size: 'small' }}
+              bottomLine={{ text: describeStatusAlert(statusAlert), size: 'large' }}
+              background={ROW_BG}
+              action={<PencilSimple size={20} />}
+            />
+          </button>
         )}
       </div>
     </div>
