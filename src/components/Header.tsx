@@ -60,12 +60,17 @@ export function Header({
 
   return (
     <div className="relative w-full" style={{ height: LIGHT_HEIGHT }}>
-      {/* Over the hero photo: translucent dark scrim, back/more buttons, address title */}
+      {!scrolled && (
+        <div className="absolute inset-x-0 top-0" style={{ height: DARK_HEIGHT, zIndex: 1 }}>
+          <ProgressiveBlur />
+        </div>
+      )}
+
+      {/* Over the hero photo: translucent dark scrim, back/more buttons, address title. */}
       <div
         className="absolute inset-x-0 top-0 transition-opacity duration-100 ease-out"
-        style={{ height: DARK_HEIGHT, opacity: 1 - scrollProgress, pointerEvents: scrolled ? 'none' : 'auto' }}
+        style={{ height: DARK_HEIGHT, opacity: 1 - scrollProgress, pointerEvents: scrolled ? 'none' : 'auto', zIndex: 2 }}
       >
-        <ProgressiveBlur />
         <div
           className="absolute inset-0"
           style={{
@@ -90,20 +95,20 @@ export function Header({
       </div>
 
       {/* Past the hero photo: light bar with the section tabs pinned in place. The
-          frosted fill only shows once content has actually scrolled underneath it. */}
+          fill is fully opaque (not a translucent blur) so scrolled content
+          underneath never shows through it. */}
       <div
         className="absolute inset-x-0 top-0 overflow-hidden rounded-b-[24px] transition-opacity duration-100 ease-out"
-        style={{ height: LIGHT_HEIGHT, opacity: scrollProgress, pointerEvents: scrolled ? 'auto' : 'none' }}
+        style={{ height: LIGHT_HEIGHT, opacity: scrollProgress, pointerEvents: scrolled ? 'auto' : 'none', zIndex: 2 }}
       >
-        <div className="absolute inset-0 transition-opacity duration-200 ease-out" style={{ opacity: contentScrolled ? 1 : 0 }}>
-          <ProgressiveBlur startBlur={20} endBlur={10} yStart={0} yEnd={100} />
+        {contentScrolled && (
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(to bottom, rgba(253,252,252,0.6), rgba(234,215,210,0.24) 100%)',
+              background: 'linear-gradient(to bottom, rgba(253,252,252,1), rgba(234,215,210,1) 100%)',
             }}
           />
-        </div>
+        )}
         <div className="relative flex flex-col">
           <StatusBar dark />
           {showTitleBarRow && (
