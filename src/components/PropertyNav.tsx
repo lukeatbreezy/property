@@ -3,7 +3,7 @@ export const NAV_TABS = ['Summary', 'Specs', 'Records', 'Owners']
 export function PropertyNav({ active, onChange }: { active: string; onChange: (tab: string) => void }) {
   const TABS = NAV_TABS
   return (
-    <div className="flex h-9 w-full shrink-0 items-center gap-1 overflow-x-auto px-4 [scrollbar-width:none]">
+    <div className="flex h-9 w-full shrink-0 items-center gap-1 overflow-x-auto px-1 [scrollbar-width:none]">
       {TABS.map((tab) => {
         const isActive = tab === active
         return (
