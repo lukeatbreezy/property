@@ -6,6 +6,10 @@ import { ProgressiveBlur } from './ProgressiveBlur'
 
 const DARK_HEIGHT = 106
 const LIGHT_HEIGHT = 158
+// StatusBar (62) + PropertyNav (36) with no title-bar row — the height of the
+// light stack on tabs (Summary) that don't show the back/save-changes row,
+// per Figma node 2104:16412 ("Header 📱" on the Property Summary screen).
+const STATUS_NAV_HEIGHT = 98
 
 function TrailingButton({
   activeTab,
@@ -40,7 +44,6 @@ function TrailingButton({
 
 export function Header({
   scrollProgress,
-  contentScrolled,
   activeTab,
   onTabChange,
   onOpenMenu,
@@ -48,7 +51,6 @@ export function Header({
   onSaveChanges,
 }: {
   scrollProgress: number
-  contentScrolled: boolean
   activeTab: string
   onTabChange: (tab: string) => void
   onOpenMenu: () => void
@@ -94,34 +96,41 @@ export function Header({
         </div>
       </div>
 
-      {/* Past the hero photo: light bar with the section tabs pinned in place. The
-          fill is fully opaque (not a translucent blur) so scrolled content
-          underneath never shows through it. */}
-      <div
-        className="absolute inset-x-0 top-0 overflow-hidden rounded-b-[24px] transition-opacity duration-100 ease-out"
-        style={{ height: LIGHT_HEIGHT, opacity: scrollProgress, pointerEvents: scrolled ? 'auto' : 'none', zIndex: 2 }}
-      >
-        {contentScrolled && (
+      {/* Past the hero photo: frosted bar with the section tabs pinned in place,
+          matching Figma's "Scroll Underlay" (backdrop-blur-5 over a translucent
+          rgba(253,252,252,0.6)→rgba(234,215,210,0.24) gradient). Mounted only
+          once actually scrolled, rather than faded in via CSS opacity — an
+          opacity style on any ancestor of a backdrop-filter element silently
+          stops the filter from painting in this browser, which is what caused
+          scrolled content to bleed straight through it before. */}
+      {scrolled && (
+        <div
+          className="absolute inset-x-0 top-0 overflow-hidden rounded-b-[24px]"
+          style={{ height: showTitleBarRow ? LIGHT_HEIGHT : STATUS_NAV_HEIGHT }}
+        >
           <div
-            className="absolute inset-0"
+            className="pointer-events-none absolute inset-0"
             style={{
-              background: 'linear-gradient(to bottom, rgba(253,252,252,1), rgba(234,215,210,1) 100%)',
+              zIndex: 1,
+              backdropFilter: 'blur(5px)',
+              WebkitBackdropFilter: 'blur(5px)',
+              background: 'linear-gradient(to bottom, rgba(253,252,252,0.6), rgba(234,215,210,0.24) 79%)',
             }}
           />
-        )}
-        <div className="relative flex flex-col">
-          <StatusBar dark />
-          {showTitleBarRow && (
-            <div className="flex items-center justify-between px-3 pb-2 pt-3">
-              <GlassButton className="pointer-events-auto size-10 shrink-0">
-                <ArrowLeft size={17} color="var(--content-primary)" />
-              </GlassButton>
-              <TrailingButton activeTab={activeTab} specsDirty={specsDirty} onSaveChanges={onSaveChanges} />
-            </div>
-          )}
-          <PropertyNav active={activeTab} onChange={onTabChange} />
+          <div className="relative flex flex-col" style={{ zIndex: 2, pointerEvents: 'auto' }}>
+            <StatusBar dark />
+            {showTitleBarRow && (
+              <div className="flex items-center justify-between px-2 pb-2 pt-3">
+                <GlassButton className="pointer-events-auto size-10 shrink-0">
+                  <ArrowLeft size={17} color="var(--content-primary)" />
+                </GlassButton>
+                <TrailingButton activeTab={activeTab} specsDirty={specsDirty} onSaveChanges={onSaveChanges} />
+              </div>
+            )}
+            <PropertyNav active={activeTab} onChange={onTabChange} />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

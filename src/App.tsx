@@ -93,10 +93,9 @@ function App() {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-10">
       <DeviceFrame
-        header={(scrollProgress, contentScrolled) => (
+        header={(scrollProgress) => (
           <Header
             scrollProgress={activeTab === 'Specs' || activeTab === 'Records' || activeTab === 'Owners' ? 1 : scrollProgress}
-            contentScrolled={contentScrolled}
             activeTab={activeTab}
             onTabChange={setActiveTab}
             onOpenMenu={() => setIsMenuOpen(true)}

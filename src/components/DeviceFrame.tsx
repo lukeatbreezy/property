@@ -31,8 +31,6 @@ function SideButton({ side, top, height }: { side: 'left' | 'right'; top: number
   )
 }
 
-const CONTENT_SCROLLED_THRESHOLD = 8
-
 export function DeviceFrame({
   header,
   dock,
@@ -40,20 +38,18 @@ export function DeviceFrame({
   children,
   onScrollProgressChange,
 }: {
-  header: (scrollProgress: number, contentScrolled: boolean) => ReactNode
+  header: (scrollProgress: number) => ReactNode
   dock: ReactNode
   overlay?: ReactNode
   children: ReactNode
   onScrollProgressChange?: (scrollProgress: number) => void
 }) {
   const [scrollProgress, setScrollProgress] = useState(0)
-  const [contentScrolled, setContentScrolled] = useState(false)
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const y = e.currentTarget.scrollTop
     const t = Math.min(1, Math.max(0, (y - FADE_START) / (FADE_END - FADE_START)))
     setScrollProgress(t)
-    setContentScrolled(y > CONTENT_SCROLLED_THRESHOLD)
     onScrollProgressChange?.(t)
   }
 
@@ -81,7 +77,7 @@ export function DeviceFrame({
           {children}
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-20">{header(scrollProgress, contentScrolled)}</div>
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20">{header(scrollProgress)}</div>
 
         <div
           className="absolute left-1/2 top-[11px] z-30 h-[37px] w-[126px] -translate-x-1/2 rounded-full bg-black"
